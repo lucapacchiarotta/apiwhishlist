@@ -16,7 +16,7 @@ abstract class AbstractApiController extends AbstractRestfulController {
         $this->_objResult = array();
         $this->_objResult['status'] = '';
         $this->_objResult['message'] = '';
-        $this->_objResult['errors'] = '';
+        $this->_objResult['extra'] = '';
     }
 
     /*

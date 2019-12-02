@@ -13,8 +13,7 @@ class IndexController extends AbstractApiController {
     }
     
     public function createlistAction() {
-        $result = 'KO';
-        $errorDesc = '';
+        $this->_objResult['status'] = self::RISP_KO;
         
         $request = $this->getRequest();
         $content = $request->getContent();
@@ -27,25 +26,25 @@ class IndexController extends AbstractApiController {
         if ($content) {
             $listName = $content->listname;
             if (empty($listName)) {
-                $errorDesc = 'List name is empty';
+                $this->_objResult['message'] = 'List name is empty';
             } else {
                 if (!isset($this->_applicationSession->lists)) {
                     $this->_applicationSession->lists = array();
                 }
                 
                 if (in_array($listName, $this->_applicationSession->lists)) {
-                    $errorDesc = 'List name is already in list';
+                    $this->_objResult['message'] = 'List name is already in list';
                 } else {
-                    $result = 'OK';
-                    $errorDesc = 'Inserted';
+                    $this->_objResult['status'] = self::RISP_OK;
+                    $this->_objResult['message'] = 'Item inserted';
+                    $this->_objResult['extra'] = $listName;
                     $this->_applicationSession->lists[] = $listName;
                 }
             }
         }
         
         return new JsonModel([
-            'status' => $result,
-            'error'  => $errorDesc
+            $this->_objResult
         ]);
     }
     
