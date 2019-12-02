@@ -1,9 +1,4 @@
 <?php
-/**
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
 
 namespace Api\Controller;
 
@@ -17,22 +12,45 @@ class IndexController extends AbstractApiController {
         $this->_applicationSession = $applicationSession;
     }
     
-    public function indexAction() {
-        return false;
-    }
-    
     public function createlistAction() {
+        $result = 'KO';
+        $errorDesc = '';
+        
+        $request = $this->getRequest();
+        $content = $request->getContent();
+        
+        
+        if ($content) {
+            $content = json_decode($content);
+        }
+        
+        if ($content) {
+            $listName = $content->listname;
+            if (empty($listName)) {
+                $errorDesc = 'List name is empty';
+            } else {
+                if (!isset($this->_applicationSession->lists)) {
+                    $this->_applicationSession->lists = array();
+                }
+                
+                if (in_array($listName, $this->_applicationSession->lists)) {
+                    $errorDesc = 'List name is already in list';
+                } else {
+                    $result = 'OK';
+                    $errorDesc = 'Inserted';
+                    $this->_applicationSession->lists[] = $listName;
+                }
+            }
+        }
+        
         return new JsonModel([
-            'status' => 'OK',
-            'message'=>'Here is your data',
-            'data' => [
-                'full_name' => 'John Doe',
-                'address' => '51 Middle st.'
-            ]
+            'status' => $result,
+            'error'  => $errorDesc
         ]);
     }
     
     public function additemtolistAction() {
+        
         return new JsonModel([
             'status' => 'OK',
             'message'=>'Here is your data',
