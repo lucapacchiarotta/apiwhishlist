@@ -15,9 +15,9 @@ return [
     'router' => [
         'routes' => [
             'home' => [
-                'type'    => Literal::class,
+                'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/api/v1/createlist',
+                    'route'    => '/api/v1/:action',
                     'defaults' => [
                         'controller' => Controller\IndexController::class,
                         'action'     => 'createlist',

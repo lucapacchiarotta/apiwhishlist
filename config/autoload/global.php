@@ -1,6 +1,9 @@
 <?php
 
 use Zend\Session\Storage\SessionArrayStorage;
+use Doctrine\DBAL\Driver\PDOSqlite\Driver;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
 
 return [
     // Session configuration.
@@ -21,5 +24,29 @@ return [
     ],
     'session_containers' => [
         'ApplicationSession'
+    ],
+    'doctrine' => [
+        'connection' => [
+            'orm_default' => [
+                'driverClass' => Driver::class,
+                'params' => [
+                    'path' => 'data/db.sqlite',
+                ],
+            ],
+        ],
+        'driver' => [
+            'Doctrine_driver' => [
+                'class' => AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => [
+                    __DIR__ . '/../../module/Api/src/Entity',
+                ],
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    'Api\\Entity' => 'Doctrine_driver',
+                ],
+            ],
+        ],
     ]
 ];
