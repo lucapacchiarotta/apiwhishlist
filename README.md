@@ -2,15 +2,15 @@
 
 API to manage wishlists.
 
-##Endpoints
+## Endpoints
 
-Method: POST
-Encoding: application/json
+Method: POST  
+Encoding: application/json  
 
-  * api/v1/createlist
+  * api/v1/createlist  
 	{
 		"user": "xx",
-		"listname": "xx"	
+		"listname": "xx"
 	}
   * api/v1/additemtolist
   	{
