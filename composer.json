@@ -16,7 +16,8 @@
 		"zfcampus/zf-development-mode" : "^3.2",
 		"zendframework/zend-session": "^2.9",
 		"doctrine/doctrine-module": "^2.1",
-		"doctrine/doctrine-orm-module": "^2.1"
+		"doctrine/doctrine-orm-module": "^2.1",
+		"zfcampus/zf-console": "^1.4"
 	},
 	"autoload" : {
 		"psr-4" : {

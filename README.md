@@ -24,6 +24,18 @@ Encoding: application/json
 		"user": "xx"
 	}
 
+## CLI
+Inside the Docker container in SSH:  
+
+```bash
+$ ./var/www/bin/cli.php --path /folder
+```
+
+OR  
+
+```bash
+$ php /var/www/bin/cli.php --path /folder
+```
 
 ## Using docker-compose
 

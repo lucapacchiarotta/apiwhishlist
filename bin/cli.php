@@ -1,48 +1,66 @@
 #!/usr/bin/php
-<?php
 
-use Zend\Mvc\Application;
-use Zend\Stdlib\ArrayUtils;
+<?php 
+
+use Zend\Console\Console;
 use Zend\ServiceManager\ServiceManager;
+use Zend\Stdlib\ArrayUtils;
+use Zend\Stdlib\Glob;
+use ZF\Console\Application;
+use ZF\Console\Dispatcher;
+use Api\Entity\Wishlist;
 
-/**
- * This makes our life easier when dealing with paths. Everything is relative
- * to the application root now.
- */
-$_SERVER['REQUEST_URI'] = 'api/v1/getlist';
+require_once __DIR__ . '/../vendor/autoload.php'; // Composer autoloader
 
-chdir(dirname(__DIR__));
-
-// Decline static file requests back to the PHP built-in webserver
-if (php_sapi_name() === 'cli-server') {
-    $path = realpath(__DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-    if (__FILE__ !== $path && is_file($path)) {
-        return false;
-    }
-    unset($path);
+$configuration = [];
+foreach (Glob::glob('../config/{{*}}{{,*.local}}.php', Glob::GLOB_BRACE) as $file) {
+    $configuration = ArrayUtils::merge($configuration, include $file);
 }
 
-// Composer autoloading
-include __DIR__ . '/../vendor/autoload.php';
+// Prepare the service manager
+$smConfig = isset($config['service_manager']) ? $configuration['service_manager'] : [];
+$smConfig = new \Zend\Mvc\Service\ServiceManagerConfig($smConfig);
 
-if (! class_exists(Application::class)) {
-    throw new RuntimeException(
-        "Unable to load application.\n"
-        . "- Type `composer install` if you are developing locally.\n"
-        . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
-        . "- Type `docker-compose run zf composer install` if you are using Docker.\n"
-        );
-}
+$serviceManager = new ServiceManager();
+$smConfig->configureServiceManager($serviceManager);
+$serviceManager->setService('ApplicationConfig', $configuration);
 
-// Retrieve configuration
-$appConfig = require __DIR__ . '/../config/application.config.php';
-if (file_exists(__DIR__ . '/../config/development.config.php')) {
-    $appConfig = ArrayUtils::merge($appConfig, require __DIR__ . '/../config/development.config.php');
-}
+// Load modules
+$serviceManager->get('ModuleManager')->loadModules();
 
-// Run the application!
-Application::init($appConfig)->run();
+$routes = [
+    [
+        'name' => 'export',
+        'route' => '[--path=]',
+        'description' => 'Export date in CSV',
+        'short_description' => 'Export date in CSV',
+        'options_descriptions' => [
+            'path'   => 'Path on filesystem for saving export data',
+        ],
+        'defaults' => [
+            'path'   => '/tmp',
+        ],
+        'handler' => function($route, $console) use ($serviceManager) {
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $entityManager = $serviceManager->get(\Doctrine\ORM\EntityManager::class);
+            /** @var mixed $repository */
+            $list = $entityManager->getRepository(Wishlist::class);
+            //var_dump($entityManager);
+            $handler = new \Api\Command\ExportCommand($list);
+            return $handler($route, $console);
+        }
+    ],
+];
 
-echo "Hello" . $argv[1];
+$config = $serviceManager->get('config');
+//var_dump($config);
+$application = new Application(
+    'APP', //$config['app'],
+    '1.0', // $config['version'],
+    $routes,
+    Console::getInstance(),
+    new Dispatcher()
+);
 
-
+$exit = $application->run();
+exit($exit);

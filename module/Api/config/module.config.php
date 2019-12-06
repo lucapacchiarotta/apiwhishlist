@@ -43,7 +43,7 @@ return [
             'orm_default' => [
                 'driverClass' => Driver::class,
                 'params' => [
-                    'path' => 'data/db.sqlite',
+                    'path' => '/var/www/data/db.sqlite',
                 ],
             ],
         ],
