@@ -28,13 +28,13 @@ Encoding: application/json
 Inside the Docker container in SSH:  
 
 ```bash
-$ ./var/www/bin/cli.php --path /folder
+$ ./var/www/bin/cli.php export --path /folder
 ```
 
 OR  
 
 ```bash
-$ php /var/www/bin/cli.php --path /folder
+$ php /var/www/bin/cli.php export --path /folder
 ```
 
 ## Using docker-compose
