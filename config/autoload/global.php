@@ -24,29 +24,5 @@ return [
     ],
     'session_containers' => [
         'ApplicationSession'
-    ],
-    'doctrine' => [
-        'connection' => [
-            'orm_default' => [
-                'driverClass' => Driver::class,
-                'params' => [
-                    'path' => 'data/db.sqlite',
-                ],
-            ],
-        ],
-        'driver' => [
-            'Doctrine_driver' => [
-                'class' => AnnotationDriver::class,
-                'cache' => 'array',
-                'paths' => [
-                    __DIR__ . '/../../module/Api/src/Entity',
-                ],
-            ],
-            'orm_default' => [
-                'drivers' => [
-                    'Api\\Entity' => 'Doctrine_driver',
-                ],
-            ],
-        ],
     ]
 ];

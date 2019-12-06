@@ -1,14 +1,13 @@
 <?php
-namespace Application\Entity;
+namespace Api\Entity;
 use Doctrine\ORM\Mapping as ORM;
 /**
- * Album
+ * Wishlist
  *
- * @ORM\Table(name="album")
+ * @ORM\Table(name="list")
  * @ORM\Entity
  */
-class Whishlist
-{
+class Wishlist {
     /**
      * @var integer
      *
@@ -17,58 +16,74 @@ class Whishlist
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
+    
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", nullable=true)
+     * @ORM\Column(name="name", type="text", nullable=false)
      */
     private $name;
+    
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     * @ORM\Column(name="items", type="text", nullable=true)
      */
-    private $createdAt;
+    private $items;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="user", type="text", nullable=false)
+     */
+    private $user;
+    
     /**
      * @return int
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
     /**
      * @param int $id
      */
-    public function setId($id)
-    {
+    public function setId($id) {
         $this->id = $id;
     }
     /**
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
     /**
      * @param string $name
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
     }
     /**
-     * @return \DateTime
+     * @return string
      */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
+    public function getItems() {
+        return $this->items;
     }
     /**
-     * @param \DateTime $createdAt
+     * @param string $items
      */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
+    public function setItems($items) {
+        $this->items = $items;
+    }
+    /**
+     * @return string
+     */
+    public function getUser() {
+        return $this->user;
+    }
+    /**
+     * @param string $user
+     */
+    public function setUser($user) {
+        $this->user = $user;
     }
 }

@@ -3,7 +3,7 @@
 namespace Api\Controller;
 
 use Zend\View\Model\JsonModel;
-use Application\Entity\Whishlist;
+use Api\Entity\Wishlist;
 
 class IndexController extends AbstractApiController {
     
@@ -14,15 +14,22 @@ class IndexController extends AbstractApiController {
         $this->em = $em;
     }
     
+    /**
+     * Creazione di una nuova lista dei desideri
+     * @return \Zend\View\Model\JsonModel
+     */
     public function createlistAction() {
         $this->_objResult['status'] = self::RISP_KO;
         
-        //$lista = $this->em->getRepository(Whishlist::class)->findAll();
-        //$this->_objResult['list'] = $lista;
+        try {
+            
+            
+        } catch (\Exception $e) {
+            $this->_objResult['db_err'] = $e->getMessage();
+        }
         
         $request = $this->getRequest();
         $content = $request->getContent();
-        
         
         if ($content) {
             $content = json_decode($content);
@@ -30,20 +37,29 @@ class IndexController extends AbstractApiController {
         
         if ($content) {
             $listName = $content->listname;
-            if (empty($listName)) {
-                $this->_objResult['message'] = 'List name is empty';
+            $user = $content->user;
+            
+            if (empty($listName) || empty($user)) {
+                $this->_objResult['message'] = 'Missing mandatory data';
             } else {
-                if (!isset($this->_applicationSession->lists)) {
-                    $this->_applicationSession->lists = array();
-                }
                 
-                if (in_array($listName, $this->_applicationSession->lists)) {
-                    $this->_objResult['message'] = 'List name is already in list';
+                $item = $this->em
+                    ->getRepository(Wishlist::class)
+                    ->findOneBy(['name' => $listName]);
+                
+                if ($item) {
+                    $this->_objResult['message'] = 'List name exists';
                 } else {
+                    $list = new Wishlist();
+                    $list->setName($listName);
+                    $list->setUser($user);
+                    
+                    $this->em->persist($list);
+                    $this->em->flush();
+                    
                     $this->_objResult['status'] = self::RISP_OK;
                     $this->_objResult['message'] = 'Item inserted';
                     $this->_objResult['extra'] = $listName;
-                    $this->_applicationSession->lists[] = $listName;
                 }
             }
         }
@@ -53,6 +69,10 @@ class IndexController extends AbstractApiController {
         ]);
     }
     
+    /**
+     * Aggiunta di una voce ad una specifica lista dei desideri
+     * @return \Zend\View\Model\JsonModel
+     */
     public function additemtolistAction() {
         $this->_objResult['status'] = self::RISP_KO;
         
@@ -67,40 +87,88 @@ class IndexController extends AbstractApiController {
         if ($content) {
             $listName = $content->listname;
             $listItem = $content->listitem;
-            if (empty($listName) || empty($listItem)) {
-                $this->_objResult['message'] = 'List name and/or list item are empty';
+            $user = $content->user;
+            
+            if (empty($listName) || empty($listItem) || empty($user)) {
+                $this->_objResult['message'] = 'Missing mandatory data';
             } else {
-                if (!isset($this->_applicationSession->lists)) {
-                    $this->_applicationSession->lists = array();
-                }
                 
-                if (!isset($this->_applicationSession->lists[$listName])) {
-                    $this->_applicationSession->lists = array();
+                $item = $this->em
+                    ->getRepository(Wishlist::class)
+                    ->findOneBy(['name' => $listName, 'user' => $user]);
+                
+                if (!$item) {
                     $this->_objResult['message'] = 'List not found';
                 } else {
-                    $this->_applicationSession->lists[$listName]['items'][] = $listItem;
-
+                    $items = $item->getItems();
+                    
+                    if (empty($items)) {
+                        $items = [];
+                    } else {
+                        $items = json_decode($items);
+                    }
+                    $items[] = $listItem;
+                    
+                    $item->setItems(json_encode($items));
+                    
+                    //$this->em->persist($item);
+                    $this->em->flush();
+                    
                     $this->_objResult['status'] = self::RISP_OK;
                     $this->_objResult['message'] = 'Item inserted';
                     $this->_objResult['extra'] = "$listName:$listItem";
-                    $this->_applicationSession->lists[] = $listName;
                 }
             }
         }
-        $this->_objResult['aa'] = $this->_applicationSession->lists;
+        
         return new JsonModel([
             $this->_objResult
         ]);
     }
     
-    public function getlistitemsAction() {
+    /**
+     * Torna gli elementi di una lista dei desideri specifica
+     * @return \Zend\View\Model\JsonModel
+     */
+    public function getlistAction() {
+        $this->_objResult['status'] = self::RISP_KO;
+        
+        $request = $this->getRequest();
+        $content = $request->getContent();
+        
+        if ($content) {
+            $content = json_decode($content);
+        }
+        
+        if ($content) {
+            $listName = $content->listname;
+            if (empty($listName)) {
+                $this->_objResult['message'] = 'List name is empty';
+            } else {
+                
+                $item = $this->em
+                    ->getRepository(Wishlist::class)
+                    ->findOneBy(['name' => $listName]);
+                
+                if (!$item) {
+                    $this->_objResult['message'] = 'List not found';
+                } else {
+                    $items = $item->getItems();
+                    
+                    if (empty($items)) {
+                        $items = [];
+                    } else {
+                        $items = json_decode($items);
+                    }
+                    
+                    $this->_objResult['status'] = self::RISP_OK;
+                    $this->_objResult['data'] = $items;
+                }
+            }
+        }
+        
         return new JsonModel([
-            'status' => 'OK',
-            'message'=>'Here is your data',
-            'data' => [
-                'full_name' => 'John Doe',
-                'address' => '51 Middle st.'
-            ]
+            $this->_objResult
         ]);
     }
 }
