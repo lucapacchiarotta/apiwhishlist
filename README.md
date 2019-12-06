@@ -12,13 +12,13 @@ Encoding: application/json
 		"user": "xx",
 		"listname": "xx"
 	}
-  * api/v1/additemtolist
+  * api/v1/additemtolist  
   	{
 		"listname": "xx",
 		"listitem": "xx",
 		"user": "xx"
 	}
-  * api/v1/getlist
+  * api/v1/getlist  
   	{
 		"listname": "xx",
 		"user": "xx"
