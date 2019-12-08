@@ -1,6 +1,11 @@
 # Apiwhislist
 
-API to manage wishlists.
+API to manage wishlists. Based on Zend Framework 3.  
+
+Set special permissions:
+
+chmod -R 777 data  
+chmod +x bin/cli.php  
 
 ## Endpoints
 
@@ -60,16 +65,7 @@ $ docker-compose run zf composer install
 
 ## Running Unit Tests
 
-To run the supplied skeleton unit tests, you need to do one of the following:
-
-- During initial project creation, select to install the MVC testing support.
-- After initial project creation, install [zend-test](https://zendframework.github.io/zend-test/):
-
-  ```bash
-  $ composer require --dev zendframework/zend-test
-  ```
-
-Once testing support is present, you can run the tests using:
+To run unit tests:
 
 ```bash
 $ ./vendor/bin/phpunit
