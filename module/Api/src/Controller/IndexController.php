@@ -7,10 +7,8 @@ use Api\Entity\Wishlist;
 
 class IndexController extends AbstractApiController {
     
-    protected $_applicationSession;
     
-    public function __construct($applicationSession, $em) {
-        $this->_applicationSession = $applicationSession;
+    public function __construct($em) {
         $this->em = $em;
     }
     

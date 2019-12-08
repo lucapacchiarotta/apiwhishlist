@@ -13,7 +13,6 @@
 return [
     'Zend\Router',
     'Zend\Validator',
-    'Zend\Session',
     'DoctrineModule',
     'DoctrineORMModule',
     'Api',
