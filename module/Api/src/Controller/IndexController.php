@@ -140,13 +140,15 @@ class IndexController extends AbstractApiController {
         
         if ($content) {
             $listName = $content->listname;
-            if (empty($listName)) {
-                $this->_objResult['message'] = 'List name is empty';
+            $user = $content->user;
+            
+            if (empty($listName) || empty($user)) {
+                $this->_objResult['message'] = 'Missing mandatory data';
             } else {
                 
                 $item = $this->em
                     ->getRepository(Wishlist::class)
-                    ->findOneBy(['name' => $listName]);
+                    ->findOneBy(['name' => $listName, 'user' => $user]);
                 
                 if (!$item) {
                     $this->_objResult['message'] = 'List not found';
